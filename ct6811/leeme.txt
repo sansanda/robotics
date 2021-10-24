@@ -1,0 +1,58 @@
+
+	MICROBOTICA
+
+			  
+
+	Los siguientes programas son FREEWARE!!
+
+
+       AS11: Ensamblador del 68HC11 que genera el formato .S19
+	     ej: AS11 ledp.asm
+
+       DOWNMCU: Programa que permite cargar software '.s19'  en la CT6811
+	     ej: downmcu ledp [-comX]      (por defecto com1)
+
+       MCBOOT2: Terminal de comunicaciones para la CT6811
+	     ej:  mcboot2
+		  pulsar F1
+		  ledp
+
+       CTDIALOG: Programa interactivo para acceder a los recursos de la CT6811
+		  Este programa funciona con el 'ctserver' previamente cargado
+		 en la tarjeta CT6811.
+
+	      ej: downmcu ctserver [-comX]
+		  ctdialog [-comX]          ( por defecto com1 )
+
+       TOWBOOT: Entorno que engloba a todas las aplicaciones
+	       ej: twb2
+
+       EJEMPLOS: Sencillos programas de demostraci¢n para la CT6811
+
+		- ledon.asm -> enciende el led de la tarjeta.
+		- ledp.asm -> hace parpadear el led de la tarjeta
+		- ledpe.asm -> version del ledp.asm para eeprom
+		- scihola.asm -> ejemplo de comunicaciones serie (Mcboot2)
+		- menu.asm -> demo de programas interactivos (Mcboot2)
+
+	CT294: Programa para monitorizar los recusos de la tarjeta CT293+.
+	      Tarjeta de control de motores y sensores.
+		Al igual que el CTDIALOG necesita tener previamente cargado
+	      el 'ctserver' en la tarjeta CT6811. Si se dispone de reset
+	      software (en la CT6811 si se tiene) el propio programa realiza
+	      este paso previo.
+
+		ej: <Con reset software>
+		    CT294 [-X]             ( por defecto com2 )
+
+		ej: <Sin reset software>
+		    downmcu ctserver [-comX]
+		    CT294 [-X]
+
+	
+      Nuestro correo electr¢nico es
+
+			     info@microbotica.es
+
+
+

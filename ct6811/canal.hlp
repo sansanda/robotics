@@ -1,0 +1,21 @@
+                        Modulo de canalizacion
+
+ Este archivo de ejecucion por lotes (bat), es el asociado al canal elegido.
+ Cuando desde el TowerBoot se ejecuta la opcion de canal, ya sea por medio del
+menu, o por medio de la tecla directa, este fichero se ejecuta.
+ La potencia del modulo de canalizacion del TowerBoot, permite
+configurar a medida del usuario el sistema para asi obtener por medio de los
+tres canales el acceso directo y por tanto rapido a las aplicaciones que desee.
+
+Ejemplo:
+ En caso de que un usuario este haciendo pruebas, cargando en el MCU
+continuamente un mismo programa, puede acelerar el trabajo generando
+el archivo "canali.bat" tal que se ejecute la carga directamente.
+ Quedando por ejemplo:
+
+    downmcu goliat -com2
+
+ El canal I, tiene asociado el archivo "canal1.bat".
+ El canal II, tiene asociado el archivo "canal2.bat".
+ El canal III, tiene asociado el archivo "canal3.bat".
+
