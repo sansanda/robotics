@@ -51,6 +51,7 @@ MPU6050 accelgyro;
 
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
+int16_t temperature;
 
 
 
@@ -119,19 +120,22 @@ void setup() {
 
 void loop() {
     // read raw accel/gyro measurements from device
-    accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    //accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    temperature = accelgyro.getTemperature();
 
     // these methods (and a few others) are also available
-    //accelgyro.getAcceleration(&ax, &ay, &az);
-    //accelgyro.getRotation(&gx, &gy, &gz);
+    accelgyro.getAcceleration(&ax, &ay, &az);
+    accelgyro.getRotation(&gx, &gy, &gz);
 
     #ifdef OUTPUT_READABLE_ACCELGYRO
         // display tab-separated accel/gyro x/y/z values
         Serial.print("a/g:\t");
+        //Serial.print("temperature = ");
+        //Serial.print(temperature/340.00 + 36.53); Serial.print("\t");
         Serial.print(ax); Serial.print("\t");
         //Serial.print(ay); Serial.print("\t");
         //Serial.print(az); Serial.print("\t");
-        Serial.print(gx); Serial.print("\t");
+        //Serial.print(gx); Serial.print("\t");
         //Serial.print(gy); Serial.print("\t");
         //Serial.println(gz);
         Serial.println("");
@@ -150,5 +154,5 @@ void loop() {
     blinkState = !blinkState;
     digitalWrite(LED_PIN, blinkState);
 
-    delay(1000);
+    delay(100);
 }
