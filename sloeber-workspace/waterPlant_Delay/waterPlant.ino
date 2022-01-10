@@ -29,8 +29,24 @@
  * Este sensor se pincha en la tierra hasta la mitad aprox.
  */
 
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-#include "Arduino.h"
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 32 // OLED display height, in pixels
+
+// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+// The pins for I2C are defined by the Wire-library.
+// On an arduino UNO:       A4(SDA), A5(SCL)
+// On an arduino MEGA 2560: 20(SDA), 21(SCL)
+// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
+#define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+
 
 //Pines para el control de puente en H
 #define IN1 2
@@ -50,8 +66,8 @@
 
 
 //Variables de control de los niveles de humedad
-double moistureThresholdMin = 25.0; 		//60.0
-double moistureThresholdMax = 40.0; 		//75.0
+double moistureThresholdMin = 28.0; 		//60.0
+double moistureThresholdMax = 30.0; 		//75.0
 double brokenMoistureSensor_Threshold = 0.0;//3.0. Cuando la humedad medida está por debajo de este valor se considera que algo ha ocurrido con el sensor.
 		 	 	 	 	 	 	 	 	 	// Por ejemplo el sensor puede estar desconectado o roto el cable. Un valor tan bajo siempre indica una corriente
 											// muy baja por el divisor de tension que forman la R=1k y el sensor de humedad del suelo.
@@ -62,8 +78,8 @@ unsigned long 	takeCareOfPlantPeriod_in_secs 	= 3600; //3600
 
 //Variables para el control del riego de la planta
 bool 			enableWatering		= true;
-unsigned long 	wateringTime_ms 	= 2000;
-unsigned long	delayBetweenWateringTimes_ms = 10000;
+unsigned long 	wateringTime_ms 	= 5000;
+unsigned long	delayBetweenWateringTimes_ms = 120000;
 
 
 //valores de la regresion lineal de la funcion que relaciona la lectura del arduino (x = digital) con el porcentaje de humedad del suelo (y)
@@ -79,6 +95,12 @@ float m = -b/900.0;
 //The setup function is called once at startup of the sketch
 void setup()
 {
+
+	// SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+	if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+		Serial.println(F("SSD1306 allocation failed"));
+		for(;;); // Don't proceed, loop forever
+	}
 
 	// initialize serial communication at 9600 bits per second:
 	Serial.println("Initializing serial communication");
@@ -138,6 +160,8 @@ void takeCareOfPlant()
 	blinkBuiltINLed(50); // @suppress("Invalid arguments")
 
 	lastMoistureMeasure = checkMoisture(D7, D8, A0); // @suppress("Invalid arguments")
+
+	updateDisplay2(moistureThresholdMin, moistureThresholdMax, lastMoistureMeasure);
 
 	if (isSoilMoistureSensorBroken(lastMoistureMeasure)) // @suppress("Invalid arguments")
 	{
@@ -262,4 +286,48 @@ void blinkBuiltINLed(int times)
 		digitalWrite(LED_BUILTIN,LOW);
 		delay(times);
 	}
+}
+
+void updateDisplay(double min, double max, double lastMoistureMeasure)
+{
+	// Clear the buffer
+	display.clearDisplay();
+	display.display();
+
+	// Set color of the text
+	display.setTextColor(SSD1306_WHITE);
+	// Set position of cursor
+	display.setCursor(10, 5);
+	// Set text size multiplier (x1 standard size)
+	display.setTextSize(1);
+	// print text like Serial
+	display.print("MIN:"+ String(min,1) + "--MAX:"+ String(max,1));
+
+	// Set position of cursor
+	display.setCursor(10, 18);
+	// print text like Serial
+	display.print("Actual value:"+ String(lastMoistureMeasure,1));
+
+
+	display.display();
+
+}
+
+void updateDisplay2(double min, double max, double lastMoistureMeasure)
+{
+	// Clear the buffer
+	display.clearDisplay();
+	display.display();
+
+	// Set color of the text
+	display.setTextColor(SSD1306_WHITE);
+	// Set position of cursor
+	display.setCursor(10, 5);
+	// Set text size multiplier (x1 standard size)
+	display.setTextSize(2);
+	// print text like Serial
+	display.print(String(min,0) +"-"+ String(max,0) +"-"+ String(lastMoistureMeasure,0));
+
+	display.display();
+
 }
