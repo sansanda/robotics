@@ -36,7 +36,7 @@
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
-
+git
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 // The pins for I2C are defined by the Wire-library.
 // On an arduino UNO:       A4(SDA), A5(SCL)
@@ -127,7 +127,7 @@ void setup()
 	pinMode(BRIDGE_ACTIVATION_PIN, OUTPUT);
 
 
-	//Definimos como modo entrada el pin A0 (Analogico)
+	//Definimos como modo entrada el pin A0 (Analogico) para la lectura del divisor resistivo formado por un R=1k y el sensor de humedad del suelo
 	pinMode(A0, INPUT);
 
 	//Initializing outputs

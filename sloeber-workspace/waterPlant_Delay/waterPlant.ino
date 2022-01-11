@@ -66,7 +66,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 //Variables de control de los niveles de humedad
-double moistureThresholdMin = 28.0; 		//60.0
+double moistureThresholdMin = 26.0; 		//60.0
 double moistureThresholdMax = 30.0; 		//75.0
 double brokenMoistureSensor_Threshold = 0.0;//3.0. Cuando la humedad medida está por debajo de este valor se considera que algo ha ocurrido con el sensor.
 		 	 	 	 	 	 	 	 	 	// Por ejemplo el sensor puede estar desconectado o roto el cable. Un valor tan bajo siempre indica una corriente
@@ -183,6 +183,7 @@ void takeCareOfPlant()
 
 					waterPlant(IN1,IN2,wateringTime_ms); // @suppress("Invalid arguments")
 					lastMoistureMeasure = checkMoisture(D7, D8, A0); // @suppress("Invalid arguments")
+					updateDisplay2(moistureThresholdMin, moistureThresholdMax, lastMoistureMeasure);
 					if (isSoilMoistureSensorBroken(lastMoistureMeasure)) // @suppress("Invalid arguments")
 					{
 						//The sensor is broken. We cannot continue
