@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>waterPlant_Delay</name>
+	<name>playing_with_ext_interrupts</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -42,34 +42,9 @@
 			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/avr/1.8.3/variants/standard</locationURI>
 		</link>
 		<link>
-			<name>libraries/Adafruit_BusIO</name>
+			<name>libraries/examples</name>
 			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_BusIO/1.9.9</locationURI>
-		</link>
-		<link>
-			<name>libraries/Adafruit_GFX_Library</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_GFX_Library/1.10.12</locationURI>
-		</link>
-		<link>
-			<name>libraries/Adafruit_SSD1306</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_SSD1306/2.5.0</locationURI>
-		</link>
-		<link>
-			<name>libraries/Adafruit_SSD1306_Wemos_Mini_OLED</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/libraries/Adafruit_SSD1306_Wemos_Mini_OLED/1.1.2</locationURI>
-		</link>
-		<link>
-			<name>libraries/SPI</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/avr/1.8.3/libraries/SPI</locationURI>
-		</link>
-		<link>
-			<name>libraries/Wire</name>
-			<type>2</type>
-			<locationURI>ECLIPSE_HOME/arduinoPlugin/packages/arduino/hardware/avr/1.8.3/libraries/Wire</locationURI>
+			<locationURI>ECLIPSE_HOME/arduinoPlugin/examples/01.Basics/Blink</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

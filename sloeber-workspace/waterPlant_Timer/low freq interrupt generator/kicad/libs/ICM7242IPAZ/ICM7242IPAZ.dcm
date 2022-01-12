@@ -1,9 +1,0 @@
-EESchema-DOCLIB  Version 2.0
-#
-$CMP ICM7242IPAZ
-D Counter/Time Base ICs Long Range Fixed Timer
-K
-F https://www.mouser.in/datasheet/2/698/icm7242-1528825.pdf
-$ENDCMP
-#
-#End Doc Library

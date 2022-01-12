@@ -29,14 +29,16 @@
  * Este sensor se pincha en la tierra hasta la mitad aprox.
  */
 
+#include <avr/sleep.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 32 // OLED display height, in pixels
-git
+
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 // The pins for I2C are defined by the Wire-library.
 // On an arduino UNO:       A4(SDA), A5(SCL)
@@ -48,37 +50,29 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 
-//Pines para el control de puente en H
-#define IN1 2
-#define IN2 3
-#define BRIDGE_ACTIVATION_PIN 4
+//Pines para el control de puente en H, pines D10, D11 y D12
+#define IN1 10
+#define IN2 11
+#define BRIDGE_ACTIVATION_PIN 12
 
 //Pines utilizados para el sensor de humedad
 #define D7 7
 #define D8 8
 #define A0 14
 
-
-//pines utilizados para el control del display I2C de 0.91"
-#define D6 6
-#define ANCHO_PANTALLA 128 // ancho pantalla OLED
-#define ALTO_PANTALLA 64 // alto pantalla OLED
-
-
 //Variables de control de los niveles de humedad
-double moistureThresholdMin = 28.0; 		//60.0
-double moistureThresholdMax = 30.0; 		//75.0
-double brokenMoistureSensor_Threshold = 0.0;//3.0. Cuando la humedad medida está por debajo de este valor se considera que algo ha ocurrido con el sensor.
-		 	 	 	 	 	 	 	 	 	// Por ejemplo el sensor puede estar desconectado o roto el cable. Un valor tan bajo siempre indica una corriente
-											// muy baja por el divisor de tension que forman la R=1k y el sensor de humedad del suelo.
+double 	moistureThresholdMin 			= 26.0; //60.0
+double 	moistureThresholdMax 			= 30.0; //75.0
+double 	brokenMoistureSensor_Threshold = 0.0;	//3.0. Cuando la humedad medida está por debajo de este valor se considera que algo ha ocurrido con el sensor.
+		 	 	 	 	 	 	 	 	 		// Por ejemplo el sensor puede estar desconectado o roto el cable. Un valor tan bajo siempre indica una corriente
+												// muy baja por el divisor de tension que forman la R=1k y el sensor de humedad del suelo.
 
 //Variables para la medidad de la humedad
 double 			lastMoistureMeasure;
-unsigned long 	takeCareOfPlantPeriod_in_secs 	= 3600; //3600
 
 //Variables para el control del riego de la planta
-bool 			enableWatering		= true;
-unsigned long 	wateringTime_ms 	= 5000;
+bool 			enableWatering		= false;
+unsigned long 	wateringTime_ms 	= 10000;
 unsigned long	delayBetweenWateringTimes_ms = 120000;
 
 
@@ -88,9 +82,85 @@ unsigned long	delayBetweenWateringTimes_ms = 120000;
 float b = 100.0;
 float m = -b/900.0;
 
-//Display
-// Objeto de la clase Adafruit_SSD1306
-//Adafruit_SSD1306 display(ANCHO_PANTALLA, ALTO_PANTALLA, &Wire, -1);
+bool interrupt_received_flag = false;
+
+byte adcsra_save;
+
+void wake ()
+{
+	// cancel sleep as a precaution
+	sleep_disable();
+	// precautionary while we do other stuff
+	detachInterrupt (0);
+
+	//enable various internal modules
+	ADCSRA = adcsra_save;
+
+	interrupt_received_flag = true;
+
+}  // end of wake
+
+void takeCareOfPlant()
+{
+
+	sendMessageToDisplay("CHECK MOIST"); // @suppress("Invalid arguments")
+	lastMoistureMeasure = checkMoisture(D7, D8, A0); // @suppress("Invalid arguments")
+
+	if (isSoilMoistureSensorBroken(lastMoistureMeasure)) // @suppress("Invalid arguments")
+	{
+		sendMessageToDisplay("BROKEN SENSOR!!"); // @suppress("Invalid arguments")
+	}
+	else
+	{
+		sendMoistureParametersToDisplay(moistureThresholdMin, moistureThresholdMax, lastMoistureMeasure); // @suppress("Invalid arguments")
+
+		if (lastMoistureMeasure<moistureThresholdMin) enableWatering = true;
+		if (lastMoistureMeasure>=moistureThresholdMax) enableWatering = false;
+
+		if (
+				(lastMoistureMeasure>moistureThresholdMin && lastMoistureMeasure<moistureThresholdMax && enableWatering)
+				|| lastMoistureMeasure<moistureThresholdMin
+			)
+		{
+			//("Moisture value is under the minimum = " + String(moistureThresholdMin));
+			waterPlant(IN1,IN2,wateringTime_ms); // @suppress("Invalid arguments")
+		}
+	}
+
+}
+
+void setupInSleepingModeAndListenInterrupts()
+{
+	//Configure again for interrupts
+	// disable various modules but first save the registers
+	adcsra_save = ADCSRA; 	//adc
+	//prr_save = PRR;			//power reduction register
+
+	ADCSRA = 0;	//turn off adc
+
+	set_sleep_mode (SLEEP_MODE_PWR_DOWN);
+	sleep_enable();
+
+	// Do not interrupt before we go to sleep, or the
+	// ISR will detach interrupts and we won't wake.
+	noInterrupts ();
+
+	// will be called when pin D2 goes low
+	attachInterrupt (0, wake, FALLING); // @suppress("Invalid arguments")
+	EIFR = bit (INTF0);  // clear flag for interrupt 0
+
+	// turn off brown-out enable in software (for power saving purposes only)
+	// BODS must be set to one and BODSE must be set to zero within four clock cycles
+	MCUCR = bit (BODS) | bit (BODSE);
+	// The BODS bit is automatically cleared after three clock cycles
+	MCUCR = bit (BODS);
+
+	// We are guaranteed that the sleep_cpu call will be done
+	// as the processor executes the next instruction after
+	// interrupts are turned on.
+	interrupts ();  // one cycle
+	sleep_cpu ();   // one cycle
+}
 
 //The setup function is called once at startup of the sketch
 void setup()
@@ -98,18 +168,15 @@ void setup()
 
 	// SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
 	if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-		Serial.println(F("SSD1306 allocation failed"));
+		//(F("SSD1306 allocation failed"));
 		for(;;); // Don't proceed, loop forever
 	}
-
-	// initialize serial communication at 9600 bits per second:
-	Serial.println("Initializing serial communication");
-	Serial.begin(9600);
-	delay(100);
 
 	// Add your initialization code here
 
 	pinMode(LED_BUILTIN, OUTPUT);
+
+	pinMode(2,INPUT);  // Enable interrupt input D2 as input
 
 	//Definimos como modo salida los pines IN1 y IN2 (digitales) que servirán para controlar la salida 1 del doble puente en H que es el L298N
 	pinMode(IN1, OUTPUT);
@@ -119,15 +186,12 @@ void setup()
 	pinMode(D7, OUTPUT);
 	pinMode(D8, OUTPUT);
 
-	//Definimos como modo salida los pines D7 y D8 (digitales) que servirán para polarizar el sensor de humedad del suelo (moisture sensor)
-	pinMode(D6, OUTPUT);
-
 
 	//Definimos como modo salida el pin BRIDGE_ACTIVATION_PIN = 4 que serirá para alimentar la lógica del puente en H.
 	pinMode(BRIDGE_ACTIVATION_PIN, OUTPUT);
 
 
-	//Definimos como modo entrada el pin A0 (Analogico) para la lectura del divisor resistivo formado por un R=1k y el sensor de humedad del suelo
+	//Definimos como modo entrada el pin A0 (Analogico)
 	pinMode(A0, INPUT);
 
 	//Initializing outputs
@@ -136,70 +200,28 @@ void setup()
 	digitalWrite(IN2, LOW);
 	digitalWrite(D7, LOW);
 	digitalWrite(D8, LOW);
-	digitalWrite(D6, LOW);
 	digitalWrite(BRIDGE_ACTIVATION_PIN, LOW);
+
+	setupInSleepingModeAndListenInterrupts(); // @suppress("Invalid arguments")
 
 }
 
 // The loop function is called in an endless loop
 void loop()
 {
-	takeCareOfPlant(); // @suppress("Invalid arguments")
-	delay(takeCareOfPlantPeriod_in_secs*1000);
+	if (interrupt_received_flag)
+	{
+		takeCareOfPlant();
+		interrupt_received_flag = false;
+		setupInSleepingModeAndListenInterrupts(); // @suppress("Invalid arguments")
+	}
 }
-
 
 
 //****************************************
 //FIN CONFIGURACION TIMER E INTERRUPCIONES
 //****************************************
 
-void takeCareOfPlant()
-{
-
-	blinkBuiltINLed(50); // @suppress("Invalid arguments")
-
-	lastMoistureMeasure = checkMoisture(D7, D8, A0); // @suppress("Invalid arguments")
-
-	updateDisplay2(moistureThresholdMin, moistureThresholdMax, lastMoistureMeasure);
-
-	if (isSoilMoistureSensorBroken(lastMoistureMeasure)) // @suppress("Invalid arguments")
-	{
-		//The sensor is broken. We cannot continue
-	}
-	else
-	{
-		if ((lastMoistureMeasure>moistureThresholdMin)) {
-			//Don't do anything
-			Serial.println("Moisture above = " + String(moistureThresholdMin));
-		}
-		else
-		{
-			Serial.println("Moisture value is under the minimum = " + String(moistureThresholdMin));
-			if (enableWatering)
-			{
-				while (lastMoistureMeasure<moistureThresholdMax)
-				{
-
-					waterPlant(IN1,IN2,wateringTime_ms); // @suppress("Invalid arguments")
-					lastMoistureMeasure = checkMoisture(D7, D8, A0); // @suppress("Invalid arguments")
-					if (isSoilMoistureSensorBroken(lastMoistureMeasure)) // @suppress("Invalid arguments")
-					{
-						//The sensor is broken. We cannot continue
-						break;
-					}
-
-					delay(delayBetweenWateringTimes_ms);
-				}
-			}
-			else
-			{
-				Serial.println("Watering is disabled. Then, we won't water the plant");
-			}
-
-		}
-	}
-}
 
 bool isSoilMoistureSensorBroken(double moistureMeasure)
 {
@@ -208,7 +230,7 @@ bool isSoilMoistureSensorBroken(double moistureMeasure)
 	if (lastMoistureMeasure<brokenMoistureSensor_Threshold)
 	{
 		//No conduce corriente o esta es muy baja. Posible rotura del sensor o del cable o fallo en la conexion con el Arduino
-		Serial.println("OJO!!!! POSIBLE ROTURA DEL CABLE DEL SENSOR O FALLO EN LA CONEXION CON EL ARDUINO.");
+		//("OJO!!!! POSIBLE ROTURA DEL CABLE DEL SENSOR O FALLO EN LA CONEXION CON EL ARDUINO.");
 		BrokenMoistureSensor = true;
 	}
 
@@ -218,15 +240,15 @@ bool isSoilMoistureSensorBroken(double moistureMeasure)
 double checkMoisture(int positivePin, int negativePin, int channelLecture)
 {
 
-	Serial.println("Checking plant moisture value....");
+	//("Checking plant moisture value....");
 
 	unsigned int  a0_lecture = readMoistureSensor(D7, D8, A0); // @suppress("Invalid arguments")
 
-	Serial.println("Plant Moisture Lecture = " + String(a0_lecture));
+	//("Plant Moisture Lecture = " + String(a0_lecture));
 
 	double moistureLecture = (m * a0_lecture) + b;
 
-	Serial.println("Plant Moisture in percent = " + String(moistureLecture));
+	//("Plant Moisture in percent = " + String(moistureLecture));
 
 	return moistureLecture;
 }
@@ -259,7 +281,8 @@ unsigned int readMoistureSensor(int positivePin, int negativePin, int channelLec
 
 void waterPlant(int controlPin1, int controlPin2, unsigned long wateringTime_ms)
 {
-	Serial.println("Proceding to water the plant....");
+	//("Proceding to water the plant....");
+	sendMessageToDisplay("WATERING");
 
 	digitalWrite(BRIDGE_ACTIVATION_PIN, HIGH); //Activación de la lógica de control del puente en H
 
@@ -277,18 +300,8 @@ void waterPlant(int controlPin1, int controlPin2, unsigned long wateringTime_ms)
 
 }
 
-void blinkBuiltINLed(int times)
-{
-	for (int i=times;i>0;i--)
-	{
-		digitalWrite(LED_BUILTIN,HIGH);
-		delay(times);
-		digitalWrite(LED_BUILTIN,LOW);
-		delay(times);
-	}
-}
 
-void updateDisplay(double min, double max, double lastMoistureMeasure)
+void sendMoistureParametersToDisplay(double min, double max, double lastMoistureMeasure)
 {
 	// Clear the buffer
 	display.clearDisplay();
@@ -297,37 +310,41 @@ void updateDisplay(double min, double max, double lastMoistureMeasure)
 	// Set color of the text
 	display.setTextColor(SSD1306_WHITE);
 	// Set position of cursor
-	display.setCursor(10, 5);
-	// Set text size multiplier (x1 standard size)
-	display.setTextSize(1);
-	// print text like Serial
-	display.print("MIN:"+ String(min,1) + "--MAX:"+ String(max,1));
-
-	// Set position of cursor
-	display.setCursor(10, 18);
-	// print text like Serial
-	display.print("Actual value:"+ String(lastMoistureMeasure,1));
-
-
-	display.display();
-
-}
-
-void updateDisplay2(double min, double max, double lastMoistureMeasure)
-{
-	// Clear the buffer
-	display.clearDisplay();
-	display.display();
-
-	// Set color of the text
-	display.setTextColor(SSD1306_WHITE);
-	// Set position of cursor
-	display.setCursor(10, 5);
+	display.setCursor(0, 5);
 	// Set text size multiplier (x1 standard size)
 	display.setTextSize(2);
 	// print text like Serial
 	display.print(String(min,0) +"-"+ String(max,0) +"-"+ String(lastMoistureMeasure,0));
 
 	display.display();
+}
 
+void sendMessageToDisplay(String message)
+{
+	// Clear the buffer
+	display.clearDisplay();
+	display.display();
+
+	// Set color of the text
+	display.setTextColor(SSD1306_WHITE);
+	// Set position of cursor
+	display.setCursor(0, 5);
+	// Set text size multiplier (x1 standard size)
+	display.setTextSize(2);
+	// print text like Serial
+	display.print(message);
+
+	display.display();
+}
+
+void myDelay(unsigned long delayInMillis)
+{
+	unsigned long actualTime = millis();
+	unsigned long deadTime = actualTime + delayInMillis;
+
+
+	while (actualTime<deadTime)
+	{
+		actualTime = millis();
+	}
 }
