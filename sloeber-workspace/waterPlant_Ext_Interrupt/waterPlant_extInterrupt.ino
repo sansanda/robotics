@@ -61,7 +61,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define A0 14
 
 //Variables de control de los niveles de humedad
-double 	moistureThresholdMin 			= 26.0; //60.0
+double 	moistureThresholdMin 			= 22.0; //60.0
 double 	moistureThresholdMax 			= 30.0; //75.0
 double 	brokenMoistureSensor_Threshold = 0.0;	//3.0. Cuando la humedad medida está por debajo de este valor se considera que algo ha ocurrido con el sensor.
 		 	 	 	 	 	 	 	 	 		// Por ejemplo el sensor puede estar desconectado o roto el cable. Un valor tan bajo siempre indica una corriente
@@ -102,7 +102,6 @@ void wake ()
 
 void takeCareOfPlant()
 {
-
 	sendMessageToDisplay("CHECK MOIST"); // @suppress("Invalid arguments")
 	lastMoistureMeasure = checkMoisture(D7, D8, A0); // @suppress("Invalid arguments")
 
@@ -113,10 +112,8 @@ void takeCareOfPlant()
 	else
 	{
 		sendMoistureParametersToDisplay(moistureThresholdMin, moistureThresholdMax, lastMoistureMeasure); // @suppress("Invalid arguments")
-
 		if (lastMoistureMeasure<moistureThresholdMin) enableWatering = true;
 		if (lastMoistureMeasure>=moistureThresholdMax) enableWatering = false;
-
 		if (
 				(lastMoistureMeasure>moistureThresholdMin && lastMoistureMeasure<moistureThresholdMax && enableWatering)
 				|| lastMoistureMeasure<moistureThresholdMin
@@ -125,8 +122,8 @@ void takeCareOfPlant()
 			//("Moisture value is under the minimum = " + String(moistureThresholdMin));
 			waterPlant(IN1,IN2,wateringTime_ms); // @suppress("Invalid arguments")
 		}
+		sendMoistureParametersToDisplay(moistureThresholdMin, moistureThresholdMax, lastMoistureMeasure); // @suppress("Invalid arguments")
 	}
-
 }
 
 void setupInSleepingModeAndListenInterrupts()
