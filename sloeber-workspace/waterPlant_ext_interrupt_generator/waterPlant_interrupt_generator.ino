@@ -37,7 +37,7 @@
 
 
 //Variables para el control de la frecuencia con la que se genera el pulso de interrupcion
-unsigned long 	pulsePeriod 			= 60000; 	// in ms
+unsigned long 	pulsePeriod 			= 360000; 	// 360000 in ms
 unsigned long 	pulseOnTime 			= 200; 	//in ms
 
 
@@ -45,21 +45,42 @@ unsigned long 	pulseOnTime 			= 200; 	//in ms
 void setup()
 {
 
+	Serial.begin(9600);
+
 	// Add your initialization code here
 
 	pinMode(pinD2, OUTPUT);
+	pinMode(LED_BUILTIN, OUTPUT);
 
 
 	//Initializing outputs
 	digitalWrite(pinD2, LOW);
+	digitalWrite(LED_BUILTIN, LOW);
 
 }
 
 // The loop function is called in an endless loop
 void loop()
 {
-	delay(pulsePeriod - pulseOnTime);
+	myDelay(pulsePeriod - pulseOnTime);
 	digitalWrite(pinD2, HIGH);
-	delay(pulseOnTime);
+	myDelay(pulseOnTime);
 	digitalWrite(pinD2, LOW);
+}
+
+void myDelay(unsigned long delayInMillis)
+{
+
+	unsigned long actualTime = millis();
+	unsigned long initialTime = actualTime;
+	unsigned long deadTime = actualTime + delayInMillis;
+	int val = int(((actualTime - initialTime)/double(deadTime))*255);
+
+	while (actualTime<deadTime)
+	{
+		actualTime = millis();
+		val = int(((actualTime - initialTime)/double(deadTime))*255);
+		//Serial.println(String(val));
+		//analogWrite(LED_BUILTIN, 0);
+	}
 }
