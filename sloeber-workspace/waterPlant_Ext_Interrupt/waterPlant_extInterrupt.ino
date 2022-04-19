@@ -73,14 +73,14 @@ double 			lastMoistureMeasure;
 
 //Variables para el control del riego de la planta
 bool 			enableWatering		= false;
-unsigned long 	wateringTime_ms 	= 100; //10000
+unsigned long 	wateringTime_ms 	= 15000; //10000
 
 
 //valores de la regresion lineal de la funcion que relaciona la lectura del arduino (x = digital) con el porcentaje de humedad del suelo (y)
-//Cuando el sustrato se encuentra practicamente seco, el valor que lee el arduino en el divisor de tension es 900.
+//Cuando el sustrato se encuentra practicamente seco, el valor que lee el arduino en el divisor de tension es 1024.
 //Cuando el sensor se introduce en agua el valor que lee el arduino es 0.
 float b = 100.0;
-float m = -b/900.0;
+float m = -b/1024.0;
 
 bool interrupt_received_flag = false;
 
@@ -109,10 +109,8 @@ void takeCareOfPlant()
 	long count = 1000000;
 	long i = 0;
 
-	sendMessageToDisplay(String(lastMoistureMeasure));
-	myDelay(2000);
-
-
+	//sendMessageToDisplay(String(lastMoistureMeasure));
+	//myDelay(2000);
 
 	if (isSoilMoistureSensorBroken(lastMoistureMeasure)) // @suppress("Invalid arguments")
 	{

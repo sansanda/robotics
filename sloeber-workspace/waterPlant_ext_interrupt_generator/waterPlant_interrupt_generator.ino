@@ -37,7 +37,7 @@
 
 
 //Variables para el control de la frecuencia con la que se genera el pulso de interrupcion
-unsigned long 	pulsePeriod 			= 10000; 	// in ms
+unsigned long 	pulsePeriod 			= 60000; 	// in ms
 unsigned long 	pulseOnTime 			= 200; 	//in ms
 
 
