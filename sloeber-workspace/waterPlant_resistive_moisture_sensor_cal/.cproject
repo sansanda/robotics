@@ -24,8 +24,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_GFX_Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_BusIO}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_SSD1306}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1197215364" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -36,8 +34,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_GFX_Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_BusIO}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_SSD1306}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.363756552" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -48,8 +44,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_GFX_Library}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_BusIO}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Adafruit_SSD1306}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/waterPlant_resistive_moisture_sensor_cal/libraries/SPI/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.813397010" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

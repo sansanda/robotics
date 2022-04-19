@@ -29,11 +29,12 @@
  * Este sensor se pincha en la tierra hasta la mitad aprox.
  */
 
-#include <avr/sleep.h>
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <avr/sleep.h>
 
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -72,8 +73,7 @@ double 			lastMoistureMeasure;
 
 //Variables para el control del riego de la planta
 bool 			enableWatering		= false;
-unsigned long 	wateringTime_ms 	= 10000;
-unsigned long	delayBetweenWateringTimes_ms = 120000;
+unsigned long 	wateringTime_ms 	= 100; //10000
 
 
 //valores de la regresion lineal de la funcion que relaciona la lectura del arduino (x = digital) con el porcentaje de humedad del suelo (y)
@@ -104,6 +104,15 @@ void takeCareOfPlant()
 {
 	sendMessageToDisplay("CHECK MOIST"); // @suppress("Invalid arguments")
 	lastMoistureMeasure = checkMoisture(D7, D8, A0); // @suppress("Invalid arguments")
+
+
+	long count = 1000000;
+	long i = 0;
+
+	sendMessageToDisplay(String(lastMoistureMeasure));
+	myDelay(2000);
+
+
 
 	if (isSoilMoistureSensorBroken(lastMoistureMeasure)) // @suppress("Invalid arguments")
 	{
@@ -162,6 +171,8 @@ void setupInSleepingModeAndListenInterrupts()
 //The setup function is called once at startup of the sketch
 void setup()
 {
+
+	Serial.begin(9600);
 
 	// SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
 	if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {

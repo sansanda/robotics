@@ -1,0 +1,4 @@
+resistive Lecture = 815	percent = 26	reference Lecture = 387	percent = 64
+resistive Lecture = 815	percent = 26	reference Lecture = 387	percent = 64
+resistive Lecture = 823	percent = 25	reference Lecture = 387	percent = 64
+resistive Lecture = 815	percent = 26	reference Lecture = 387	percent = 64

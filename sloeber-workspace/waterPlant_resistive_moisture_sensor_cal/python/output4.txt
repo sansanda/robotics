@@ -1,0 +1,2 @@
+resistive Lecture = 802	percent = 28	reference Lecture = 370	percent = 70
+resistive Lecture = 793	percent = 29	reference Lecture = 370	percent = 70

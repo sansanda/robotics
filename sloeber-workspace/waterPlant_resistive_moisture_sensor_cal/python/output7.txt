@@ -1,0 +1,13 @@
+resistive Lecture = 895	percent = 16	reference Lecture = 413	percent = 55
+resistive Lecture = 886	percent = 17	reference Lecture = 413	percent = 55
+resistive Lecture = 895	percent = 16	reference Lecture = 413	percent = 55
+resistive Lecture = 887	percent = 17	reference Lecture = 413	percent = 55
+resistive Lecture = 887	percent = 17	reference Lecture = 414	percent = 55
+resistive Lecture = 894	percent = 16	reference Lecture = 414	percent = 55
+resistive Lecture = 894	percent = 16	reference Lecture = 414	percent = 55
+resistive Lecture = 895	percent = 16	reference Lecture = 414	percent = 55
+resistive Lecture = 887	percent = 17	reference Lecture = 414	percent = 55
+resistive Lecture = 887	percent = 17	reference Lecture = 414	percent = 55
+resistive Lecture = 895	percent = 16	reference Lecture = 414	percent = 55
+resistive Lecture = 893	percent = 16	reference Lecture = 414	percent = 55
+resistive Lecture = 894	percent = 16	reference Lecture = 414	percent = 55
