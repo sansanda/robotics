@@ -63,7 +63,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Variables de control de los niveles de humedad
 double 	moistureThresholdMin 			= 22.0; //60.0
-double 	moistureThresholdMax 			= 30.0; //75.0
+double 	moistureThresholdMax 			= 26.0; //75.0
 double 	brokenMoistureSensor_Threshold = 0.0;	//3.0. Cuando la humedad medida está por debajo de este valor se considera que algo ha ocurrido con el sensor.
 		 	 	 	 	 	 	 	 	 		// Por ejemplo el sensor puede estar desconectado o roto el cable. Un valor tan bajo siempre indica una corriente
 												// muy baja por el divisor de tension que forman la R=1k y el sensor de humedad del suelo.
@@ -73,7 +73,7 @@ double 			lastMoistureMeasure;
 
 //Variables para el control del riego de la planta
 bool 			enableWatering		= false;
-unsigned long 	wateringTime_ms 	= 15000; //10000
+unsigned long 	wateringTime_ms 	= 5000; //10000
 
 
 //valores de la regresion lineal de la funcion que relaciona la lectura del arduino (x = digital) con el porcentaje de humedad del suelo (y)
@@ -320,7 +320,12 @@ void sendMoistureParametersToDisplay(double min, double max, double lastMoisture
 	// Set text size multiplier (x1 standard size)
 	display.setTextSize(2);
 	// print text like Serial
-	display.print(String(min,0) +"-"+ String(max,0) +"-"+ String(lastMoistureMeasure,0));
+
+	String signal = "U";
+	if (!enableWatering) signal = "D";
+
+	String text = String(min,0) +"-"+ String(max,0) +"-"+ String(lastMoistureMeasure,0) + "-" +signal;
+	display.print(text);
 
 	display.display();
 }

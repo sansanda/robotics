@@ -34,11 +34,11 @@
 
 //Pines para la generacion del pulso de interrupcion en D2
 #define pinD2 2 //2
-
+#define T10MIN 600000 //ms
 
 //Variables para el control de la frecuencia con la que se genera el pulso de interrupcion
-unsigned long 	pulsePeriod 			= 360000; 	// 360000 in ms
-unsigned long 	pulseOnTime 			= 200; 	//in ms
+unsigned long 	pulsePeriod 			= T10MIN*3; 	//in ms
+unsigned long 	pulseOnTime 			= 200; 			//in ms
 
 
 //The setup function is called once at startup of the sketch
@@ -62,10 +62,11 @@ void setup()
 // The loop function is called in an endless loop
 void loop()
 {
-	myDelay(pulsePeriod - pulseOnTime);
+
 	digitalWrite(pinD2, HIGH);
 	myDelay(pulseOnTime);
 	digitalWrite(pinD2, LOW);
+	myDelay(pulsePeriod - pulseOnTime);
 }
 
 void myDelay(unsigned long delayInMillis)
